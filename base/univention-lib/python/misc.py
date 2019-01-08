@@ -32,6 +32,7 @@ Univention Common Python Library
 
 import univention.config_registry
 import subprocess
+from urllib import quote
 
 
 def createMachinePassword():
@@ -80,7 +81,7 @@ def getLDAPURIs(configRegistryInstance=None):
 	if ldap_server_addition:
 		ldaphosts.extend(ldap_server_addition.split())
 	if ldaphosts:
-		urilist = ["ldap://%s:%s" % (host, port) for host in ldaphosts]
+		urilist = ["ldap://%s:%s" % (quote(host), quote(port)) for host in ldaphosts]
 		uri_string = ' '.join(urilist)
 
 	return uri_string

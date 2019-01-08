@@ -1,6 +1,9 @@
 authz-regexp
     uid=([^,]*),cn=(gssapi|saml),cn=auth
-    ldap:///@%@ldap/base@%@??sub?uid=$1
+@!@
+from urllib import quote
+print '\tldap:///%s??sub?uid=$1' % (quote(configRegistry['ldap/base']),)
+@!@
 
 # allow authentication
 access to attrs=userPassword

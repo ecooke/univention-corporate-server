@@ -1,5 +1,6 @@
 @!@
 from univention.lib.misc import custom_username, custom_groupname
+from urllib import quote
 
 ldap_base = configRegistry['ldap/base']
 ldap_port = configRegistry['slapd/port']
@@ -10,7 +11,7 @@ users_default_administrator = custom_username('Administrator')
 
 print 'authz-regexp'
 print '    uid=([^,]*),cn=(gssapi|saml),cn=auth'
-print '    ldap:///%s??sub?uid=$1' % (ldap_base,)
+print '    ldap:///%s??sub?uid=$1' % (quote(ldap_base),)
 print
 
 print 'access to attrs=uid value=root by * none stop'
