@@ -155,12 +155,6 @@ mapping.register('hosts', 'umcOperationSetHost')
 class object(simpleLdap):
 	module = module
 
-	@classmethod
-	def unmapped_lookup_filter(cls):
-		return udm_filter.conjunction('&', [
-			udm_filter.expression('objectClass', 'umcOperationSet')
-		])
-
 
 lookup = object.lookup
 
