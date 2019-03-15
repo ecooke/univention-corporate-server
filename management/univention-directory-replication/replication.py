@@ -44,7 +44,6 @@ import ldap
 import ldap.schema
 # import ldif as ldifparser since the local module already uses ldif as variable
 import ldif as ldifparser
-import re
 import time
 import base64
 import univention.debug as ud
@@ -69,7 +68,6 @@ LDAP_DIR = '/var/lib/univention-ldap/'
 STATE_DIR = '/var/lib/univention-directory-replication'
 BACKUP_DIR = '/var/univention-backup/replication'
 LDIF_FILE = os.path.join(STATE_DIR, 'failed.ldif')
-ROOTPW_FILE = '/etc/ldap/rootpw.conf'
 CURRENT_MODRDN = os.path.join(STATE_DIR, 'current_modrdn')
 
 EXCLUDE_ATTRIBUTES = [
@@ -541,20 +539,8 @@ def connect(ldif=0):
 
 	if not os.path.exists(LDIF_FILE) and not ldif:
 		# ldap connection
-		if not os.path.exists('/etc/ldap/rootpw.conf'):
-			pw = new_password()
-			init_slapd('restart')
-		else:
-			pw = get_password()
-			if not pw:
-				pw = new_password()
-				init_slapd('restart')
-
-		local_ip = '127.0.0.1'
-		local_port = listener.baseConfig.get('slapd/port', '7389').split(',')[0]
-
-		connection = ldap.open(local_ip, int(local_port))
-		connection.simple_bind_s('cn=update,' + listener.baseConfig['ldap/base'], pw)
+		connection = ldap.initialize('ldapi:///')
+		connection.sasl_non_interactive_bind_s('EXTERNAL')
 	else:
 		connection = LDIFObject(LDIF_FILE)
 
@@ -997,64 +983,7 @@ def initialize():
 		return 1
 	clean()
 	ud.debug(ud.LISTENER, ud.INFO, 'replication: initializing cache')
-	new_password()
 	init_slapd('start')
-
-
-def randpw(length=8):
-	"""Create random password.
-	>>> randpw().isalnum()
-	True
-	"""
-	password = []
-	rand = open('/dev/urandom', 'r')
-	try:
-		for _ in xrange(length):
-			octet = ord(rand.read(1))
-			octet %= len(randpw.VALID)  # pylint: disable-msg=E1101
-			char = randpw.VALID[octet]  # pylint: disable-msg=E1101
-			password.append(char)
-	finally:
-		rand.close()
-	return ''.join(password)
-
-
-randpw.VALID = (
-	'0123456789'  # pylint: disable-msg=W0612
-	'abcdefghijklmnopqrstuvwxyz'
-	'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-)
-
-
-def new_password():
-	pw = randpw()
-
-	listener.setuid(0)
-	try:
-		with open(ROOTPW_FILE, 'w') as fd:
-			os.fchmod(fd.fileno(), 0o600)
-			print >>fd, 'rootpw "%s"' % (pw.replace('\\', '\\\\').replace('"', '\\"'),)
-	finally:
-		listener.unsetuid()
-
-	return pw
-
-
-def get_password():
-	listener.setuid(0)
-	try:
-		with open(ROOTPW_FILE, 'r') as fd:
-			for line in fd:
-				match = get_password.RE_ROOTDN.match(line)
-				if match:
-					return match.group(1).replace('\\"', '"').replace('\\\\', '\\')
-			else:
-				return ''
-	finally:
-		listener.unsetuid()
-
-
-get_password.RE_ROOTDN = re.compile(r'^rootpw[ \t]+"((?:[^"\\]|\\["\\])+)"')
 
 
 def init_slapd(arg):

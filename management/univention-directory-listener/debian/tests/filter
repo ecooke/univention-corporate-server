@@ -186,7 +186,6 @@ UDL () {
 		-c /var/lib/univention-directory-listener \
 		-H "ldap://$FQDN:$PORT" -h "$FQDN" -p "$PORT" \
 		-x -D "cn=admin,$BASE" -w "$SECRET"
-	secret="$(sed -rne 's/^\s*rootpw\s*"(([^\"]|\\")*)"\s*(#.*)?$/\1/;T;s/\\"/"/g;p;q' /etc/ldap/rootpw.conf)"
 
 	/usr/sbin/univention-directory-listener \
 		-d 2 \
@@ -209,7 +208,7 @@ REPLICATION () {
 		read -r lid </var/lib/univention-directory-listener/notifier_id || :  # Ignore EOF error before \n
 		[ "$tid" -eq "$lid" ] && break
 	done
-	ldapsearch -xLLLo ldif-wrap=no -H "ldap://$FQDN:7389" -b "cn=test${n:-},$BASE" -s base -ZZ -D "cn=update,$BASE" -w "$secret" 1.1
+	ldapsearch -Q -Y "EXTERNAL" LLLo ldif-wrap=no -H "ldapi:///" -b "cn=test${n:-},$BASE" -s base 1.1
 }
 REPLICATION
 

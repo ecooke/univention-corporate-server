@@ -34,6 +34,7 @@ import os
 import getopt
 import univention.debug
 import univention.misc
+import univention.uldap
 
 import univention.config_registry
 import univention.admin.uldap
@@ -127,34 +128,31 @@ def doit(arglist):
 		# check for local ldap server connection
 		if configRegistry.is_true('ldap/replication/preferredpassword'):
 			if configRegistry.get('ldap/server/type') == 'slave':
-				if os.path.exists('/etc/ldap/rootpw.conf'):
-					bindpw = open('/etc/ldap/rootpw.conf').read()
-					bindpw = bindpw.split(' ')[1].strip('\n\r"')
-					lo = univention.admin.uldap.access(host='%s.%s' % (configRegistry['hostname'], configRegistry['domainname']), base=baseDN, binddn='cn=update,%s' % (baseDN), bindpw=bindpw, start_tls=2)
-					dn = lo.searchDn(filter=unicode('(&(uid=%s)(|(objectClass=posixAccount)(objectClass=sambaSamAccount)(objectClass=person)))' % user, 'utf8'), base=baseDN, unique=True)
-					position = univention.admin.uldap.position(baseDN)
-					module = univention.admin.modules.get('users/user')
-					univention.admin.modules.init(lo, position, module)
+				lo = univention.uldap.getRootDnConnection()
+				dn = lo.searchDn(filter=unicode('(&(uid=%s)(|(objectClass=posixAccount)(objectClass=sambaSamAccount)(objectClass=person)))' % user, 'utf8'), base=baseDN, unique=True)
+				position = univention.admin.uldap.position(baseDN)
+				module = univention.admin.modules.get('users/user')
+				univention.admin.modules.init(lo, position, module)
 
-					object = univention.admin.objects.get(module, None, lo, position=position, dn=dn[0])
-					object.open()
+				object = univention.admin.objects.get(module, None, lo, position=position, dn=dn[0])
+				object.open()
 
-					if 'samba/charset/unix' not in configRegistry:
-						univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: no unix-charset given')
-						object['password'] = unicode(pwd, 'utf8')
-					elif configRegistry['samba/charset/unix'] in ['utf8', 'latin']:
-						univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: known charset given: %s' % configRegistry['samba/charset/unix'])
-						object['password'] = unicode(pwd, configRegistry['samba/charset/unix'])
-					else:
-						univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: unknown charset given, try fallback')
-						object['password'] = unicode(pwd)
+				if 'samba/charset/unix' not in configRegistry:
+					univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: no unix-charset given')
+					object['password'] = unicode(pwd, 'utf8')
+				elif configRegistry['samba/charset/unix'] in ['utf8', 'latin']:
+					univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: known charset given: %s' % configRegistry['samba/charset/unix'])
+					object['password'] = unicode(pwd, configRegistry['samba/charset/unix'])
+				else:
+					univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: unknown charset given, try fallback')
+					object['password'] = unicode(pwd)
 
-					univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: passwd set, modify object')
-					object['overridePWHistory'] = '1'
-					object['overridePWLength'] = '1'
-					dn = object.modify()
+				univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: passwd set, modify object')
+				object['overridePWHistory'] = '1'
+				object['overridePWLength'] = '1'
+				dn = object.modify()
 
-					univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: password changed')
+				univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: password changed')
 	except Exception, e:
 		univention.debug.debug(univention.debug.ADMIN, univention.debug.WARN, 'passwd error: %s' % e)
 

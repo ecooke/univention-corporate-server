@@ -126,11 +126,6 @@ fake_replication () {
 	sync
 	chown -R openldap: /var/lib/univention-ldap/ldap
 
-	if [ ! -s /etc/ldap/rootpw.conf ]
-	then
-		. /usr/share/univention-lib/base.sh
-		echo "rootpw \"$(create_machine_password)\"" > /etc/ldap/rootpw.conf
-	fi
 	service slapd restart
 
 	# resync computer object

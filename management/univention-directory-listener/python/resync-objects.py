@@ -52,21 +52,12 @@ def main():
 	ucr = univention.config_registry.ConfigRegistry()
 	ucr.load()
 	base = ucr.get("ldap/base")
-	binddn = "cn=update,%s" % base
-	with open("/etc/ldap/rootpw.conf", "r") as fh:
-		for line in fh:
-			line = line.strip()
-			if line.startswith('rootpw '):
-				bindpw = line[7:].strip('"')
-				break
-		else:
-			exit(1)
 
 	if not opts.filter:
 		opts.filter = '(uid=%s$)' % ucr['hostname']
 
 	# get local and master connection
-	local = uldap.access(binddn=binddn, bindpw=bindpw, start_tls=0, host="localhost", port=389)
+	local = uldap.getRootDnConnection()
 	if ucr.get("server/role", "") == "domaincontroller_backup":
 		master = uldap.getAdminConnection()
 	else:
@@ -101,7 +92,6 @@ def main():
 				print('  ==> modifying object')
 				if not opts.simulate:
 					local.modify(dn, modlist)
-
 
 
 if __name__ == "__main__":

@@ -85,15 +85,25 @@ def getRootDnConnection(start_tls=2, decode_ignorelist=[], reconnect=True):  # t
 	"""
 	ucr = ConfigRegistry()
 	ucr.load()
-	port = int(ucr.get('slapd/port', '7389').split(',')[0])
-	host = ucr['hostname'] + '.' + ucr['domainname']
+	connection_settings = {
+		'start_tls': start_tls,
+		'decode_ignorelist': decode_ignorelist,
+		'reconnect': reconnect,
+		'base': ucr['ldap/base'],
+		'follow_referral': False,
+	}
 	if ucr.get('ldap/server/type', 'dummy') == 'master':
-		bindpw = open('/etc/ldap.secret').read().rstrip('\n')
-		binddn = 'cn=admin,{0}'.format(ucr['ldap/base'])
+		connection_settings['port'] = int(ucr.get('slapd/port', '7389').split(',')[0])
+		connection_settings['host'] = ucr['hostname'] + '.' + ucr['domainname']
+		connection_settings['bindpw'] = open('/etc/ldap.secret').read().rstrip('\n')
+		connection_settings['binddn'] = 'cn=admin,{0}'.format(ucr['ldap/base'])
+		lo = access(**connection_settings)
 	else:
-		bindpw = open('/etc/ldap/rootpw.conf').read().rstrip('\n').lstrip('rootpw "').rstrip('"')
-		binddn = 'cn=update,{0}'.format(ucr['ldap/base'])
-	return access(host=host, port=port, base=ucr['ldap/base'], binddn=binddn, bindpw=bindpw, start_tls=start_tls, decode_ignorelist=decode_ignorelist, reconnect=reconnect)
+		connection_settings['uri'] = 'ldapi:///'
+		connection_settings['start_tls'] = 0  # tls doesn't work on a socket
+		lo = access(**connection_settings)
+		lo.bind_noninteractive_sasl('EXTERNAL')
+	return lo
 
 
 def getAdminConnection(start_tls=2, decode_ignorelist=[], reconnect=True):  # type: (int, List[str], bool) -> access
@@ -276,6 +286,16 @@ class access:
 		self.lo.sasl_interactive_bind_s('', saml)
 		self.binddn = re.sub('^dn:', '', self.lo.whoami_s())
 		univention.debug.debug(univention.debug.LDAP, univention.debug.INFO, 'SAML bind binddn=%s' % self.binddn)
+
+	def bind_noninteractive_sasl(self, method):  # type: (str) -> None
+		"""
+		Do noninteractive SASL bind.
+
+		:param str method: A non-interactive SASL method (e.g. GSSAPI, EXTERNAL)
+		"""
+		self.lo.sasl_noninteractive_bind_s(method)
+		self.binddn = re.sub('^dn:', '', self.lo.whoami_s())
+		univention.debug.debug(univention.debug.LDAP, univention.debug.INFO, 'SASL noninteractive bind binddn=%s' % self.binddn)
 
 	def unbind(self):  # type: () -> None
 		"""

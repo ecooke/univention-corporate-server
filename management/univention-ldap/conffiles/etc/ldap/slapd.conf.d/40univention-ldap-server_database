@@ -102,9 +102,7 @@ print
 if configRegistry['ldap/server/type'] == "master":
 	print 'rootdn\t\t"cn=admin,%(ldap/base)s"' % configRegistry
 elif configRegistry['ldap/server/type'] == "slave":
-	print 'rootdn\t\t"cn=update,%s"'%configRegistry['ldap/base']
-	print 'include\t\t/etc/ldap/rootpw.conf'
-	print 'updatedn\t"cn=update,%s"'%configRegistry["ldap/base"]
+	print 'rootdn\t\t"gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth"'
 	if configRegistry.is_true("ldap/online/master", True):
 		print 'updateref\tldap://%s:%s'% (configRegistry["ldap/master"], configRegistry.get("ldap/master/port", 7389))
 @!@

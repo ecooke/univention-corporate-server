@@ -465,14 +465,8 @@ echo -e "\v$test"
 	echo -e "\v===> copy ldif to $rmhost"
 	univention-scp -timeout 60 "$pw" backup.ldif "root@$rmhost:~/"
 
-	echo -e "\v===> get ldap-rootpw from $rmhost"
-	univention-scp -timeout 60 "$pw" "root@$rmhost:/etc/ldap/rootpw.conf" .
-	rootpw=`cat rootpw.conf |awk '{print $2}' |perl -pi -e 's/\"/ /g'`
-	echo -e "===> sounds like: $rootpw"
-	rm rootpw.conf
-
 	echo -e "\v===> using ldif on $rmhost"
-	cmd="ldapmodify -x -D 'cn=update,$ldap_base' -w '$rootpw' -f backup.ldif"
+	cmd="ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f backup.ldif"
 	univention-ssh -timeout 60 "$pw" "root@$rmhost" $cmd
 
 	echo -e "\v===> using ldif on master"
