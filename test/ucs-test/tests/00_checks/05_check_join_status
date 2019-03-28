@@ -8,5 +8,7 @@
 
 . "$TESTLIBPATH/base.sh" || exit 137
 
+return 110
+
 /usr/share/univention-join/check_join_status ||
 	fail_fast 110 "check_join_status failed"
