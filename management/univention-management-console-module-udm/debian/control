@@ -18,6 +18,7 @@ Depends: ${misc:Depends},
  univention-directory-reports,
  python-tornado,
  python-mimeparse,
+ python-concurrent.futures,
 Provides: univention-directory-manager
 Replaces: univention-directory-manager (<< 9.0.0)
 Description: UMC module for UCS Directory Manager
