@@ -30,7 +30,6 @@
 # /usr/share/common-licenses/AGPL-3; if not, see
 # <http://www.gnu.org/licenses/>.
 
-import os
 import getopt
 import univention.debug
 import univention.misc
@@ -78,7 +77,7 @@ def doit(arglist):
 	univention.debug.debug(univention.debug.ADMIN, univention.debug.WARN, 'binddn: %s; bindpwd: *************' % (binddn))
 	try:
 		lo = univention.admin.uldap.access(host=configRegistry['ldap/master'], port=int(configRegistry.get('ldap/master/port', '7389')), base=baseDN, binddn=binddn, bindpw=bindpw, start_tls=2)
-	except Exception, e:
+	except Exception as e:
 		univention.debug.debug(univention.debug.ADMIN, univention.debug.WARN, 'authentication error: %s' % str(e))
 		out.append('authentication error: %s' % e)
 		return out
@@ -119,7 +118,7 @@ def doit(arglist):
 		out.append('passwd error: password already used')
 		return out
 
-	except Exception, e:
+	except Exception as e:
 		univention.debug.debug(univention.debug.ADMIN, univention.debug.WARN, 'passwd error: %s' % e)
 		out.append('passwd error: %s' % e)
 		return out
@@ -153,7 +152,7 @@ def doit(arglist):
 				dn = object.modify()
 
 				univention.debug.debug(univention.debug.ADMIN, univention.debug.INFO, 'univention-passwd: password changed')
-	except Exception, e:
+	except Exception as e:
 		univention.debug.debug(univention.debug.ADMIN, univention.debug.WARN, 'passwd error: %s' % e)
 
 	return out
