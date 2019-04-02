@@ -320,7 +320,7 @@ class access:
 			if self.start_tls == 1:
 				try:
 					self.lo.start_tls_s()
-				except:
+				except ldap.PROTOCOL_ERROR:
 					univention.debug.debug(univention.debug.LDAP, univention.debug.WARN, 'Could not start TLS')
 			elif self.start_tls == 2:
 				self.lo.start_tls_s()
@@ -918,7 +918,7 @@ class access:
 			if self.start_tls == 1:
 				try:
 					lo_ref.start_tls_s()
-				except:
+				except ldap.PROTOCOL_ERROR:
 					univention.debug.debug(univention.debug.LDAP, univention.debug.WARN, 'Could not start TLS')
 			elif self.start_tls == 2:
 				lo_ref.start_tls_s()
