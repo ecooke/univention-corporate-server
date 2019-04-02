@@ -1,3 +1,9 @@
+univention-directory-manager-modules (14.0.12-11) unstable; urgency=medium
+
+  * Bug #48606: Switch to ldapi for root dn ldap connections
+
+ -- Jürn Brodersen <brodersen@univention.de>  Tue, 02 Apr 2019 11:23:41 +0200
+
 univention-directory-manager-modules (14.0.12-10) unstable; urgency=medium
 
   * Bug #35687: correct isinstance check
