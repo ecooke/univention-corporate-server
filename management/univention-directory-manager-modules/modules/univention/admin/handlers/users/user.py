@@ -1494,6 +1494,8 @@ mapping.register('password', 'userPassword', univention.admin.mapping.dontMap(),
 class object(univention.admin.handlers.simpleLdap):
 	module = module
 
+	use_performant_ldap_search_filter = True
+
 	@property
 	def __forward_copy_to_self(self):
 		return self.get('mailForwardCopyToSelf') == '1'
