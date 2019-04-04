@@ -175,7 +175,4 @@ class object(univention.admin.handlers.simplePolicy):
 
 
 lookup = object.lookup
-
-
-def identify(dn, attr, canonical=0):
-	return 'univentionPolicyDhcpScope' in attr.get('objectClass', [])
+identify = object.identify

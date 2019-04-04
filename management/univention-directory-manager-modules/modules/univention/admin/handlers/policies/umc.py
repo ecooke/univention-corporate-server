@@ -128,7 +128,4 @@ class object(simplePolicy):
 
 
 lookup = object.lookup
-
-
-def identify(dn, attr, canonical=0):
-	return 'umcPolicy' in attr.get('objectClass', [])
+identify = object.identify
