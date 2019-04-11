@@ -1,3 +1,9 @@
+univention-appcenter (8.0.11-9) unstable; urgency=medium
+
+  * Bug #49145 - Migrate to dh_python2
+
+ -- Dirk Wiesenthal <wiesenthal@univention.de>  Thu, 11 Apr 2019 16:52:32 +0200
+
 univention-appcenter (8.0.11-8) unstable; urgency=medium
 
   * Bug #48895: Run listener handler as root as it may need to build the App
