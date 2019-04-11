@@ -1,3 +1,9 @@
+univention-s4-connector (13.0.2-5) unstable; urgency=medium
+
+  * Bug #41554: remove dead custom attribute code
+
+ -- Florian Best <best@univention.de>  Thu, 11 Apr 2019 09:21:17 +0200
+
 univention-s4-connector (13.0.2-4) unstable; urgency=medium
 
   * Bug #27804: remove the use of univention.admin.config
