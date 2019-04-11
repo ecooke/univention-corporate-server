@@ -1816,7 +1816,6 @@ class simpleComputer(simpleLdap):
 			long_description='',
 			syntax=univention.admin.syntax.string,
 			may_change=False,
-			identifies=False
 		)
 		self['dnsAlias'] = []  # defined here to avoid pseudo non-None value of [''] in modwizard search
 		self.oldinfo['ip'] = []
