@@ -242,11 +242,7 @@ run_join_scripts () {
 			fi
 			if [ "$server_role" = "domaincontroller_slave" -o "$server_role" = "domaincontroller_backup" ]; then
 
-				# check failed.ldif
 				if [ "$(basename "$i")" = "03univention-directory-listener.inst" ]; then
-					if [ -e /var/lib/univention-directory-replication/failed.ldif ]; then
-						failed_message "FAILED: failed.ldif exists."
-					fi
 
 					# backup
 					if [ "$server_role" = "domaincontroller_backup" ]; then
@@ -556,6 +552,15 @@ if [ "$CHECK_RUN" = "false" ] && [ "$server_role" = "domaincontroller_backup" -o
 		if ! is_ucr_true ldap/overlay/memberof; then
 			failed_message "$msg the UCR variable ldap/overlay/memberof has to be set to true."
 		fi
+	fi
+fi
+
+#Check if failed.ldif exists
+if [ "$server_role" = "domaincontroller_slave" -o "$server_role" = "domaincontroller_backup" ]; then
+	echo "check if /var/lib/univention-directory-replication/failed.ldif exists" >>/var/log/univention/join.log
+	if [ -e /var/lib/univention-directory-replication/failed.ldif ]; then
+		rm /var/lib/univention-directory-replication/failed.ldif
+		echo "Removed failed.ldif" >>/var/log/univention/join.log
 	fi
 fi
 
