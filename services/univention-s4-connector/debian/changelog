@@ -1,3 +1,9 @@
+univention-s4-connector (13.0.2-5) unstable; urgency=medium
+
+  * Bug #47008: global_ignore_subtree is now configurable via ucr variable connector/s4/mapping/ignoresubtree/.*
+
+ -- Julia Bremer <bremer@univention.de>  Wed, 17 Apr 2019 18:57:59 +0200
+
 univention-s4-connector (13.0.2-4) unstable; urgency=medium
 
   * Bug #27804: remove the use of univention.admin.config
