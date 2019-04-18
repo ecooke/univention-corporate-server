@@ -36,16 +36,6 @@ univention-config-registry set notifier/autostart?yes
 
 #DEBHELPER#
 
-install -m0700 -o0 -g0 -d /var/lib/univention-ldap/notify
-
-if [ ! -d /var/lib/univention-ldap/schema ]; then
-	mkdir -p /var/lib/univention-ldap/schema
-fi
-
-if [ ! -d /var/lib/univention-ldap/schema/id ]; then
-	mkdir -p /var/lib/univention-ldap/schema/id
-fi
-
 if [ ! -e /var/lib/univention-ldap/schema/id/id ]; then
 	touch /var/lib/univention-ldap/schema/id/id
 	chown listener /var/lib/univention-ldap/schema/id/id >/dev/null 2>&1
