@@ -60,7 +60,7 @@ typedef struct network_client {
 
 }NetworkClient_t;
 
-int network_create_socket();
+int network_create_socket( int port );
 
 int network_client_del ( int fd );
 
