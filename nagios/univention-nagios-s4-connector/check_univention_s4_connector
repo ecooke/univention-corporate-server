@@ -77,7 +77,7 @@ ret="$?"
 # check wether the s4 connector is running; for this
 # WARNING: if more then one instance of the same connector is running
 # CRITICAL: if no process is running
-/usr/lib/nagios/plugins/check_procs -w :1 -c 1: --ereg-argument-array "python.*s4connector/s4/main.py\$" >/dev/null 2>&1
+/usr/lib/nagios/plugins/check_procs -w :1 -c 1: --ereg-argument-array "python.*s4connector.s4.main\$" >/dev/null 2>&1
 ret="$?"
 case "$ret" in
 	$STATE_OK)
