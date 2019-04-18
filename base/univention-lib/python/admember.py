@@ -30,6 +30,8 @@
 # /usr/share/common-licenses/AGPL-3; if not, see
 # <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import
+
 import ldb
 import ldap
 import ldap.sasl
@@ -52,23 +54,8 @@ from univention.lib.misc import custom_groupname
 import univention.debug as ud
 from univention.config_registry.interfaces import Interfaces
 
-# Workaround for local module "dns" in s4connector:
-import sys
-import copy
-orig_path = None
-if sys.path[0] == '/usr/share/pyshared/univention/s4connector/s4':
-	orig_path = copy.deepcopy(sys.path)
-	sys.path.append(sys.path.pop(0))
-try:
-	# execute imports in try/except block as during build test scripts are
-	# triggered that refer to the netconf python submodules... and this
-	# reference triggers the import below
-	import dns.resolver
-except ImportError as e:
-	ud.debug(ud.MODULE, ud.WARN, 'Ignoring import error: %s' % e)
-finally:
-	if orig_path:
-		sys.path = orig_path
+import dns.resolver
+
 
 # Ensure unviention debug is initialized
 def initialize_debug():
@@ -86,6 +73,7 @@ def initialize_debug():
 		ud.set_level(ud.MODULE, ud.PROCESS)
 	else:
 		ud.set_level(ud.MODULE, oldLevel)
+
 
 class failedToSetService(Exception):
 
@@ -1074,7 +1062,7 @@ def prepare_dns_reverse_settings(ad_domain_info, ucr=None):
 	except (socket.herror, socket.gaierror) as exc:
 		ud.debug(ud.MODULE, ud.INFO, "Resolving %s failed: %s" % (ad_domain_info['DC IP'], exc.args[1]))
 
-	## Set a hosts/static anyway, to be safe from DNS issues (Bug #38285)
+	# Set a hosts/static anyway, to be safe from DNS issues (Bug #38285)
 	previous_ucr_set = []
 	previous_ucr_unset = []
 
@@ -1095,6 +1083,7 @@ def prepare_dns_reverse_settings(ad_domain_info, ucr=None):
 	univention.config_registry.handler_set(ucr_set)
 
 	return (previous_ucr_set, previous_ucr_unset)
+
 
 def prepare_kerberos_ucr_settings(realm=None, ucr=None):
 	ud.debug(ud.MODULE, ud.PROCESS, "Prepare Kerberos UCR settings")
